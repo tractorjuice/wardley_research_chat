@@ -22,14 +22,14 @@ MODEL = "gpt-3.5-turbo-0613"
 #MODEL = "gpt-4-0613"
 #MODEL = "gpt-4-32k-0613"
 
-st.set_page_config(page_title="Chat with Simon Wardley's Book")
-st.title("Chat with Simon Wardley's Book")
-st.sidebar.markdown("# Query this book using AI")
+st.set_page_config(page_title="Chat with Simon's Research Maps")
+st.title("Chat with Simon's Research Maps")
+st.sidebar.markdown("# Query all the maps using AI")
 st.sidebar.divider()
 st.sidebar.markdown("Developed by Mark Craddock](https://twitter.com/mcraddock)", unsafe_allow_html=True)
-st.sidebar.markdown("Current Version: 0.2.0")
+st.sidebar.markdown("Current Version: 0.0.1")
 st.sidebar.divider()
-st.sidebar.markdown("Using GPT-4 API")
+st.sidebar.markdown("Using GPT-3 API")
 st.sidebar.markdown("Not optimised")
 st.sidebar.markdown("May run out of OpenAI credits")
 st.sidebar.divider()
@@ -38,11 +38,11 @@ st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and l
 # initialize pinecone
 pinecone.init(
     api_key=st.secrets["PINECONE_API_KEY"],  # find at app.pinecone.io
-    environment=st.secrets["PINECONE_API_KEY"]  # next to api key in console
+    environment=st.secrets["PINECONE_ENV"]  # next to api key in console
     )
 
-index_name = st.secrets["INDEX_NAME"] # Put your Pincecone index name here
-name_space = st.secrets["NAME_SPACE"] # Put your Pincecone namespace here
+index_name = st.secrets["PINECONE_INDEX_NAME"] # Put your Pincecone index name here
+name_space = st.secrets["PINECONE_NAME_SPACE"] # Put your Pincecone namespace here
 
 embeddings = OpenAIEmbeddings()
 vector_store = Pinecone.from_existing_index(index_name, embeddings, namespace=name_space)
