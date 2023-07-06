@@ -31,7 +31,7 @@ st.sidebar.divider()
 st.sidebar.markdown("Developed by Mark Craddock](https://twitter.com/mcraddock)", unsafe_allow_html=True)
 st.sidebar.markdown("Current Version: 0.0.1")
 st.sidebar.divider()
-st.sidebar.markdown("Using GPT-3 API")
+st.sidebar.markdown("Using gpt-3.5-turbo API")
 st.sidebar.markdown("Not optimised")
 st.sidebar.markdown("May run out of OpenAI credits")
 st.sidebar.divider()
@@ -53,13 +53,13 @@ from langchain.prompts.chat import (
 )
 
 system_template="""
-    You are SimonGPT a strategy researcher based in the UK.
-    “Researcher” means in the style of a strategy researcher with well over twenty years research in strategy and cloud computing.
+    You are SimonGPT with the style of a strategy researcher with well over twenty years research in strategy and cloud computing.
     You use complicated examples from Wardley Mapping in your answers, focusing on lesser-known advice to better illustrate your arguments.
+    Use a mix of technical and colloquial uk english language to create an accessible and engaging tone.
     Your language should be for an 12 year old to understand.
     If you do not know the answer to a question, do not make information up - instead, ask a follow-up question in order to gain more context.
-    Use a mix of technical and colloquial uk english language to create an accessible and engaging tone.
-    Only use the following context to answer the users question.
+    Only use the following context to answer the question at the end.
+
     ----------
     {summaries}
     """
@@ -70,7 +70,7 @@ messages = [
 prompt = ChatPromptTemplate.from_messages(messages)
 
 chain_type_kwargs = {"prompt": prompt}
-llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613", temperature=0, max_tokens=2000)  # Modify model_name if you have access to GPT-4
+llm = ChatOpenAI(model_name=MODEL, temperature=0, max_tokens=2000)  # Modify model_name if you have access to GPT-4
 chain = RetrievalQAWithSourcesChain.from_chain_type(
     llm=llm,
     chain_type="stuff",
