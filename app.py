@@ -10,8 +10,11 @@ from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTempla
 from langchain.vectorstores import Pinecone
 import pinecone
 
-# Set OpenAI Model and API key
+# Set API keys
 openai.api_key = st.secrets["OPENAI_API_KEY"]
+index_name = st.secrets["PINECONE_INDEX_NAME"] # Put your Pincecone index name here
+name_space = st.secrets["PINECONE_NAME_SPACE"] # Put your Pincecone namespace here
+
 #MODEL = "gpt-3"
 #MODEL = "gpt-3.5-turbo"
 MODEL = "gpt-3.5-turbo-0613"
@@ -39,9 +42,6 @@ pinecone.init(
     api_key=st.secrets["PINECONE_API_KEY"],  # find at app.pinecone.io
     environment=st.secrets["PINECONE_ENV"]  # next to api key in console
     )
-
-index_name = st.secrets["PINECONE_INDEX_NAME"] # Put your Pincecone index name here
-name_space = st.secrets["PINECONE_NAME_SPACE"] # Put your Pincecone namespace here
 
 embeddings = OpenAIEmbeddings()
 vector_store = Pinecone.from_existing_index(index_name, embeddings, namespace=name_space)
@@ -99,6 +99,6 @@ if query := st.chat_input("How is AI used in these maps?"):
             for document in response['source_documents']:
                 if 'source' in document.metadata:
                     source_details = document.metadata['source']
-                    st.code("\nSource: ", source_details[source_details.find('/maps'):],"\n")
+                    st.write("\nSource: ", source_details[source_details.find('/maps'):],"\n")
                     #st.markdown(document.page_content)
         st.session_state.messages.append({"role": "assistant", "content": response['answer']})
