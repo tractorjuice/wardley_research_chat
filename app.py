@@ -82,14 +82,6 @@ chain = RetrievalQAWithSourcesChain.from_chain_type(
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-#print(result['question'],'\n')
-#print(result['answer'],'\n')
-
-#for document in result['source_documents']:
-#    if 'source' in document.metadata:
-#        print("\nSource: ", document.metadata['source'],"\n")
-#        print(document.page_content)
-
 for message in st.session_state.messages:
     if message["role"] in ["user", "assistant"]:
         with st.chat_message(message["role"]):
@@ -104,7 +96,7 @@ if query := st.chat_input("What question do you have for the book?"):
         with st.chat_message("assistant"):
             response = chain(query)
             st.markdown(response['answer'])
-            for document in result['source_documents']:
+            for document in response['source_documents']:
                 if 'source' in document.metadata:
                     st.markdown("\nSource: ", document.metadata['source'],"\n")
                     #st.markdown(document.page_content)
