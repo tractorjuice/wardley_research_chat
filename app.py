@@ -73,7 +73,8 @@ chain_type_kwargs = {"prompt": prompt}
 llm = ChatOpenAI(model_name=MODEL, temperature=0, max_tokens=2000)  # Modify model_name if you have access to GPT-4
 chain = RetrievalQAWithSourcesChain.from_chain_type(
     llm=llm,
-    chain_type="stuff",
+    #chain_type="stuff",
+    chain_type="map_reduce",
     retriever=vector_store.as_retriever(),
     return_source_documents=True,
     chain_type_kwargs=chain_type_kwargs
