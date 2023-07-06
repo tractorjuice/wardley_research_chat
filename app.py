@@ -87,7 +87,7 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-if query := st.chat_input("What question do you have for the book?"):
+if query := st.chat_input("How is AI used in these maps?"):
     st.session_state.messages.append({"role": "user", "content": query})
     with st.chat_message("user"):
         st.markdown(query)
@@ -98,6 +98,8 @@ if query := st.chat_input("What question do you have for the book?"):
             st.markdown(response['answer'])
             for document in response['source_documents']:
                 if 'source' in document.metadata:
-                    st.write("\nSource: ", document.metadata['source'],"\n")
+                    source_details = document.metadata['source']
+                    st.write("\nSource: ", source_details.find('/maps'),"\n")
+                     maps_start_pos = full_path.find('/maps')
                     #st.markdown(document.page_content)
         st.session_state.messages.append({"role": "assistant", "content": response['answer']})
