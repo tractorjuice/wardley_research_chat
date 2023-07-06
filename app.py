@@ -104,4 +104,8 @@ if query := st.chat_input("What question do you have for the book?"):
         with st.chat_message("assistant"):
             response = chain(query)
             st.markdown(response['answer'])
+            for document in result['source_documents']:
+                if 'source' in document.metadata:
+                    st.markdown("\nSource: ", document.metadata['source'],"\n")
+                    #st.markdown(document.page_content)
         st.session_state.messages.append({"role": "assistant", "content": response['answer']})
