@@ -100,6 +100,5 @@ if query := st.chat_input("How is AI used in these maps?"):
                 if 'source' in document.metadata:
                     source_details = document.metadata['source']
                     st.write("\nSource: ", source_details.find('/maps'),"\n")
-                     maps_start_pos = full_path.find('/maps')
                     #st.markdown(document.page_content)
         st.session_state.messages.append({"role": "assistant", "content": response['answer']})
