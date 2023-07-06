@@ -17,9 +17,9 @@ name_space = st.secrets["PINECONE_NAME_SPACE"] # Put your Pincecone namespace he
 
 #MODEL = "gpt-3"
 #MODEL = "gpt-3.5-turbo"
-MODEL = "gpt-3.5-turbo-0613"
+#MODEL = "gpt-3.5-turbo-0613"
 #MODEL = "gpt-3.5-turbo-16k"
-#MODEL = "gpt-3.5-turbo-16k-0613"
+MODEL = "gpt-3.5-turbo-16k-0613"
 #MODEL = "gpt-4"
 #MODEL = "gpt-4-0613"
 #MODEL = "gpt-4-32k-0613"
@@ -70,7 +70,7 @@ messages = [
 prompt = ChatPromptTemplate.from_messages(messages)
 
 chain_type_kwargs = {"prompt": prompt}
-llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613", temperature=0, max_tokens=256)  # Modify model_name if you have access to GPT-4
+llm = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613", temperature=0, max_tokens=2000)  # Modify model_name if you have access to GPT-4
 chain = RetrievalQAWithSourcesChain.from_chain_type(
     llm=llm,
     chain_type="stuff",
