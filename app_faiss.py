@@ -89,7 +89,7 @@ if query := st.chat_input("How is AI used in these maps?"):
         with st.chat_message("assistant"):
             response = chain(query)
             st.markdown(response['answer'])
-            source_documents = result['source_documents']
+            source_documents = response['source_documents']
             for index, document in enumerate(source_documents):
                 if 'source' in document.metadata:
                     st.write(f"Source {index + 1}:", document.metadata['source'])
