@@ -3,3 +3,4 @@ pinecone-client
 openai
 tiktoken
 streamlit
+faiss-cpu
