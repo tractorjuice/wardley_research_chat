@@ -92,7 +92,6 @@ if query := st.chat_input("How is AI used in these maps?"):
             source_documents = response['source_documents']
             for index, document in enumerate(source_documents):
                 if 'source' in document.metadata:
-                    st.write(f"Source {index + 1}:", document.metadata['source'])
-                    #source_details = document.metadata['source']
-                    #st.write("\nSource: ", source_details[source_details.find('/maps'):],"\n")
+                    source_details = document.metadata['source']
+                    st.write(f"Source {index + 1}:", source_details[source_details.find('/maps'):],"\n")
         st.session_state.messages.append({"role": "assistant", "content": response['answer']})
