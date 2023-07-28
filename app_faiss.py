@@ -39,7 +39,7 @@ MAPS_DATASTORE = "datastore"
 
 if os.path.exists(DATA_STORE_DIR):
     vector_store = FAISS.load_local(
-        MAPS_DATASTORE,
+        #MAPS_DATASTORE,
         OpenAIEmbeddings()
     )
 else:
