@@ -37,7 +37,7 @@ st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and l
 # Get datastore
 MAPS_DATASTORE = "datastore"
 
-if os.path.exists(DATA_STORE_DIR):
+if os.path.exists(MAPS_DATASTORE):
     vector_store = FAISS.load_local(
         #MAPS_DATASTORE,
         OpenAIEmbeddings()
