@@ -33,8 +33,6 @@ st.sidebar.divider()
 st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and licensed Creative Commons Attribution Share-Alike.")
 
 # initialize FAISS
-
-# Get datastore
 MAPS_DATASTORE = "datastore"
 
 if os.path.exists(MAPS_DATASTORE):
@@ -44,7 +42,7 @@ else:
 
 system_template="""
     You are SimonGPT with the style of a strategy researcher with well over twenty years research in strategy and cloud computing.
-    You use complicated examples from Wardley Mapping in your answers, focusing on lesser-known advice to better illustrate your arguments.
+    You use complicated examples from Wardley Mapping in your answers.
     Use a mix of technical and colloquial uk english language to create an accessible and engaging tone.
     Your language should be for an 12 year old to understand.
     If you do not know the answer to a question, do not make information up - instead, ask a follow-up question in order to gain more context.
@@ -63,7 +61,7 @@ chain_type_kwargs = {"prompt": prompt}
 llm = ChatOpenAI(
     model_name=MODEL,
     temperature=0,
-    max_tokens=2000
+    max_tokens=1000
 )  # Modify model_name if you have access to GPT-4
 
 chain = RetrievalQAWithSourcesChain.from_chain_type(
@@ -91,9 +89,10 @@ if query := st.chat_input("How is AI used in these maps?"):
         with st.chat_message("assistant"):
             response = chain(query)
             st.markdown(response['answer'])
-            for document in response['source_documents']:
+            source_documents = result['source_documents']
+            for index, document in enumerate(source_documents):
                 if 'source' in document.metadata:
-                    source_details = document.metadata['source']
-                    st.write("\nSource: ", source_details[source_details.find('/maps'):],"\n")
-                    #st.markdown(document.page_content)
+                    st.write(f"Source {index + 1}:", document.metadata['source'])
+                    #source_details = document.metadata['source']
+                    #st.write("\nSource: ", source_details[source_details.find('/maps'):],"\n")
         st.session_state.messages.append({"role": "assistant", "content": response['answer']})
