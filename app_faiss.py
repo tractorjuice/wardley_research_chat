@@ -38,9 +38,7 @@ st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and l
 MAPS_DATASTORE = "datastore"
 
 if os.path.exists(MAPS_DATASTORE):
-    vector_store = FAISS.load_local(
-        OpenAIEmbeddings()
-    )
+    vector_store = FAISS.load_local("index_faiss", OpenAIEmbeddings())
 else:
     st.write(f"Missing files. Upload index.faiss and index.pkl files to {DATA_STORE_DIR} directory first")
 
