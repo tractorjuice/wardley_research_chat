@@ -7,14 +7,9 @@ from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-from langchain.vectorstores import Pinecone
-import pinecone
 
 # Set API keys
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-index_name = st.secrets["PINECONE_INDEX_NAME"] # Put your Pincecone index name here
-name_space = st.secrets["PINECONE_NAME_SPACE"] # Put your Pincecone namespace here
-
 #MODEL = "gpt-3"
 #MODEL = "gpt-3.5-turbo"
 #MODEL = "gpt-3.5-turbo-0613"
@@ -37,20 +32,18 @@ st.sidebar.markdown("May run out of OpenAI credits")
 st.sidebar.divider()
 st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and licensed Creative Commons Attribution Share-Alike.")
 
-# initialize pinecone
-pinecone.init(
-    api_key=st.secrets["PINECONE_API_KEY"],  # find at app.pinecone.io
-    environment=st.secrets["PINECONE_ENV"]  # next to api key in console
+# initialize FAISS
+
+# Get datastore
+MAPS_DATASTORE = "datastore"
+
+if os.path.exists(DATA_STORE_DIR):
+    vector_store = FAISS.load_local(
+        MAPS_DATASTORE,
+        OpenAIEmbeddings()
     )
-
-embeddings = OpenAIEmbeddings()
-vector_store = Pinecone.from_existing_index(index_name, embeddings, namespace=name_space)
-
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-)
+else:
+    st.write(f"Missing files. Upload index.faiss and index.pkl files to {DATA_STORE_DIR} directory first")
 
 system_template="""
     You are SimonGPT with the style of a strategy researcher with well over twenty years research in strategy and cloud computing.
@@ -63,15 +56,14 @@ system_template="""
     ----------
     {summaries}
     """
-messages = [
+prompt_messages = [
     SystemMessagePromptTemplate.from_template(system_template),
     HumanMessagePromptTemplate.from_template("{question}")
 ]
-prompt = ChatPromptTemplate.from_messages(messages)
+prompt = ChatPromptTemplate.from_messages(prompt_messages)
 
 chain_type_kwargs = {"prompt": prompt}
 llm = ChatOpenAI(
-    #batch_size=5,
     model_name=MODEL,
     temperature=0,
     max_tokens=2000
