@@ -61,7 +61,7 @@ chain_type_kwargs = {"prompt": prompt}
 llm = ChatOpenAI(
     model_name=MODEL,
     temperature=0,
-    #max_tokens=1000
+    max_tokens=2000
 )  # Modify model_name if you have access to GPT-4
 
 chain = RetrievalQAWithSourcesChain.from_chain_type(
