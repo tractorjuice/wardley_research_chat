@@ -4,3 +4,4 @@ openai
 tiktoken
 streamlit
 faiss-cpu
+promptlayer
