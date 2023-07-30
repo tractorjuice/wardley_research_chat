@@ -1,15 +1,16 @@
-import os
-import re
+import os, re
 import openai
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
+from langchain.chat_models import PromptLayerChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 # Set API keys
 openai.api_key = st.secrets["OPENAI_API_KEY"]
+os.environ["PROMPTLAYER_API_KEY"] = st.secrets["PROMPTLAYER"]
 #MODEL = "gpt-3"
 #MODEL = "gpt-3.5-turbo"
 #MODEL = "gpt-3.5-turbo-0613"
@@ -58,10 +59,11 @@ prompt_messages = [
 prompt = ChatPromptTemplate.from_messages(prompt_messages)
 
 chain_type_kwargs = {"prompt": prompt}
-llm = ChatOpenAI(
+llm = PromptLayerChatOpenAI(
     model_name=MODEL,
     temperature=0,
-    max_tokens=2000
+    max_tokens=2000,
+    pl_tags=["researchchat"],
 )  # Modify model_name if you have access to GPT-4
 
 chain = RetrievalQAWithSourcesChain.from_chain_type(
