@@ -5,6 +5,6 @@
 Chat with Simon Wardley's Research 2022+ Maps.
 
 <div align="center">
-  <img src="learnwardleymapping.png" alt="Learn Wardley Mapping Chatbot">
+  <img src="researchmapchat.png" alt="Learn Wardley Mapping Chatbot">
 </div>
 
