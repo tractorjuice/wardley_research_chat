@@ -21,6 +21,9 @@ MODEL = "gpt-3.5-turbo-16k-0613"
 #MODEL = "gpt-4-0613"
 #MODEL = "gpt-4-32k-0613"
 
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+
 st.set_page_config(page_title="Chat with Simon's Research Maps")
 st.title("Chat with Simon's Research Maps")
 st.sidebar.markdown("# Query all the maps using AI")
@@ -30,7 +33,7 @@ st.sidebar.markdown("Current Version: 0.1.0")
 st.sidebar.divider()
 st.sidebar.markdown("Using gpt-3.5-turbo-16k API")
 st.sidebar.markdown("Uses FAISS")
-st.sidebar.markdown("May run out of OpenAI credits")
+st.sidebar.markdown(st.session_state.session_id)
 st.sidebar.divider()
 st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and licensed Creative Commons Attribution Share-Alike.")
 
@@ -64,7 +67,7 @@ llm = PromptLayerChatOpenAI(
     model_name=MODEL,
     temperature=0,
     max_tokens=2000,
-    pl_tags=["researchchat"], st.session_state.session_id],
+    pl_tags=["researchchat", st.session_state.session_id],
 )  # Modify model_name if you have access to GPT-4
 
 chain = RetrievalQAWithSourcesChain.from_chain_type(
@@ -74,9 +77,6 @@ chain = RetrievalQAWithSourcesChain.from_chain_type(
     return_source_documents=True,
     chain_type_kwargs=chain_type_kwargs
 )
-
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
     
 if "messages" not in st.session_state:
     st.session_state.messages = []
