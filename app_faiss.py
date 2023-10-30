@@ -9,9 +9,6 @@ from langchain.vectorstores import FAISS
 from langchain.chat_models import PromptLayerChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
-# Set API keys
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-os.environ["PROMPTLAYER_API_KEY"] = st.secrets["PROMPTLAYER"]
 #MODEL = "gpt-3"
 #MODEL = "gpt-3.5-turbo"
 #MODEL = "gpt-3.5-turbo-0613"
@@ -29,13 +26,14 @@ st.title("Chat with Simon's Research Maps")
 st.sidebar.markdown("# Query all the maps using AI")
 st.sidebar.divider()
 st.sidebar.markdown("Developed by Mark Craddock](https://twitter.com/mcraddock)", unsafe_allow_html=True)
-st.sidebar.markdown("Current Version: 0.1.0")
+st.sidebar.markdown("Current Version: 1.0.0")
 st.sidebar.divider()
 st.sidebar.markdown("Using gpt-3.5-turbo-16k API")
-st.sidebar.markdown("Uses FAISS")
 st.sidebar.markdown(st.session_state.session_id)
-st.sidebar.divider()
 st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and licensed Creative Commons Attribution Share-Alike.")
+st.sidebar.divider()
+# Check if the user has provided an API key, otherwise default to the secret
+user_openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", placeholder="sk-...", type="password")
 
 # initialize FAISS
 MAPS_DATASTORE = "datastore"
@@ -62,13 +60,25 @@ prompt_messages = [
 ]
 prompt = ChatPromptTemplate.from_messages(prompt_messages)
 
+if "openai_model" not in st.session_state:
+    st.session_state["openai_model"] = MODEL
+
+if user_openai_api_key:
+    # If the user has provided an API key, use it
+    # Swap out openai for promptlayer
+    promptlayer.api_key = st.secrets["PROMPTLAYER"]
+    openai = promptlayer.openai
+    openai.api_key = user_openai_api_key
+else:
+    st.warning("Please enter your OpenAI API key", icon="⚠️")
+
 chain_type_kwargs = {"prompt": prompt}
 llm = PromptLayerChatOpenAI(
     model_name=MODEL,
     temperature=0,
     max_tokens=2000,
-    pl_tags=["researchchat", st.session_state.session_id],
-)  # Modify model_name if you have access to GPT-4
+    pl_tags=["research2023chat", st.session_state.session_id],
+)
 
 chain = RetrievalQAWithSourcesChain.from_chain_type(
     llm=llm,
@@ -86,18 +96,19 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-if query := st.chat_input("How is AI used in these maps?"):
-    st.session_state.messages.append({"role": "user", "content": query})
-    with st.chat_message("user"):
-        st.markdown(query)
-      
-    with st.spinner():
-        with st.chat_message("assistant"):
-            response = chain(query)
-            st.markdown(response['answer'])
-            source_documents = response['source_documents']
-            for index, document in enumerate(source_documents):
-                if 'source' in document.metadata:
-                    source_details = document.metadata['source']
-                    st.write(f"Source {index + 1}:", source_details[source_details.find('/maps'):],"\n")
-        st.session_state.messages.append({"role": "assistant", "content": response['answer']})
+if user_openai_api_key:
+    if query := st.chat_input("How is AI used in these maps?"):
+        st.session_state.messages.append({"role": "user", "content": query})
+        with st.chat_message("user"):
+            st.markdown(query)
+          
+        with st.spinner():
+            with st.chat_message("assistant"):
+                response = chain(query)
+                st.markdown(response['answer'])
+                source_documents = response['source_documents']
+                for index, document in enumerate(source_documents):
+                    if 'source' in document.metadata:
+                        source_details = document.metadata['source']
+                        st.write(f"Source {index + 1}:", source_details[source_details.find('/maps'):],"\n")
+            st.session_state.messages.append({"role": "assistant", "content": response['answer']})
