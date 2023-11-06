@@ -1,6 +1,6 @@
 langchain
 pinecone-client
-openai
+openai==0.28.1
 tiktoken
 streamlit
 faiss-cpu
