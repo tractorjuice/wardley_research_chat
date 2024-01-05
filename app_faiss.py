@@ -90,7 +90,7 @@ if "chain" not in st.session_state:
         llm=st.session_state.llm,
         retriever=st.session_state.vector_store.as_retriever(
             search_kwargs={
-                "k": 3,
+                "k": 20,
                 #"score_threshold": .95,
                 }
             ),
