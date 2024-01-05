@@ -1,30 +1,25 @@
-import os, re
-import openai
+import os
+import re
 import uuid
+import openai
 import promptlayer
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQAWithSourcesChain
+from langchain.memory import ConversationBufferWindowMemory
+from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
 from langchain.chat_models import PromptLayerChatOpenAI
+from langchain.vectorstores import FAISS
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
-#MODEL = "gpt-3.5-turbo"
-#MODEL = "gpt-3.5-turbo-0301"
-#MODEL = "gpt-3.5-turbo-0613"
-#MODEL = "gpt-3.5-turbo-1106"
 MODEL = "gpt-3.5-turbo-16k"
-#MODEL = "gpt-3.5-turbo-16k-0613"
-#MODEL = "gpt-4"
-#MODEL = "gpt-4-0613"
-#MODEL = "gpt-4-0613"
-#MODEL = "gpt-4-32k-0613"
-#MODEL = "gpt-4-1106-preview"
 #MODEL = "gpt-4-vision-preview"
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
 st.set_page_config(page_title="Chat with Simon's Research Maps")
 st.title("Chat with Simon's Research Maps")
@@ -37,61 +32,74 @@ st.sidebar.markdown("Using gpt-3.5-turbo-16k API")
 st.sidebar.markdown(st.session_state.session_id)
 st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and licensed Creative Commons Attribution Share-Alike.")
 st.sidebar.divider()
+
 # Check if the user has provided an API key, otherwise default to the secret
 user_openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", placeholder="sk-...", type="password")
+   
+# Get datastore
+DATA_STORE_DIR = "data_store"
 
-# initialize FAISS
-MAPS_DATASTORE = "datastore"
-
-if os.path.exists(MAPS_DATASTORE):
-    vector_store = FAISS.load_local(".", OpenAIEmbeddings())
-else:
-    st.write(f"Missing files. Upload index.faiss and index.pkl files to {DATA_STORE_DIR} directory first")
-
-system_template="""
-    You are SimonGPT with the style of a strategy researcher with well over twenty years research in strategy and cloud computing.
-    You use complicated examples from Wardley Mapping in your answers.
-    Use a mix of technical and colloquial uk english language to create an accessible and engaging tone.
-    Your language should be for an 12 year old to understand.
-    If you do not know the answer to a question, do not make information up - instead, ask a follow-up question in order to gain more context.
-    Only use the following context to answer the question at the end.
-
-    ----------
-    {summaries}
-    """
-prompt_messages = [
-    SystemMessagePromptTemplate.from_template(system_template),
-    HumanMessagePromptTemplate.from_template("{question}")
-]
-prompt = ChatPromptTemplate.from_messages(prompt_messages)
-
-if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = MODEL
-
-if user_openai_api_key:
+if "vector_store" not in st.session_state:
+    if os.path.exists(DATA_STORE_DIR):
+        st.session_state.vector_store = FAISS.load_local(
+            DATA_STORE_DIR,
+            OpenAIEmbeddings()
+        )
+    else:
+        st.write(f"Missing files. Upload index.faiss and index.pkl files to {DATA_STORE_DIR} directory first")
+    
+    custom_system_template="""
+        You are SimonGPT with the style of a strategy researcher with well over twenty years research in strategy and cloud computing.
+        You use complicated examples from Wardley Mapping in your answers.
+        Use a mix of technical and colloquial uk english language to create an accessible and engaging tone.
+        Your language should be for an 12 year old to understand.
+        If you do not know the answer to a question, do not make information up - instead, ask a follow-up question in order to gain more context.
+        Your primary objective is to help the user formulate excellent answers by utilizing the context about the book and 
+        relevant details from your knowledge, along with insights from previous conversations.
+        ----------------
+        Reference Context and Knowledge from Similar Existing Services: {context}
+        Previous Conversations: {chat_history}"""
+    
+    custom_user_template = "Question:'''{question}'''"
+    
+    prompt_messages = [
+        SystemMessagePromptTemplate.from_template(custom_system_template),
+        HumanMessagePromptTemplate.from_template(custom_user_template)
+        ]
+    prompt = ChatPromptTemplate.from_messages(prompt_messages)
+    
     # If the user has provided an API key, use it
     # Swap out openai for promptlayer
     promptlayer.api_key = st.secrets["PROMPTLAYER"]
     openai = promptlayer.openai
     openai.api_key = user_openai_api_key
-else:
-    st.warning("Please enter your OpenAI API key", icon="⚠️")
 
-chain_type_kwargs = {"prompt": prompt}
-llm = PromptLayerChatOpenAI(
-    model_name=MODEL,
-    temperature=0,
-    max_tokens=2000,
-    pl_tags=["research2023chat", st.session_state.session_id],
-)
+if "memory" not in st.session_state:
+    st.session_state.memory = ConversationBufferWindowMemory(memory_key="chat_history", return_messages=True, output_key='answer')
 
-chain = RetrievalQAWithSourcesChain.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 5}), # Use MMR search and return 5 (max 20) sources
-    return_source_documents=True,
-    chain_type_kwargs=chain_type_kwargs
-)
+if "llm" not in st.session_state:
+    st.session_state.llm = PromptLayerChatOpenAI(
+        model_name=MODEL,
+        temperature=0,
+        max_tokens=300,
+        pl_tags=["bookchat", st.session_state.session_id],
+    )  # Modify model_name if you have access to GPT-4
+    
+if "chain" not in st.session_state:
+    st.session_state.chain = ConversationalRetrievalChain.from_llm(
+        llm=st.session_state.llm,
+        retriever=st.session_state.vector_store.as_retriever(
+            search_kwargs={
+                "k": 3,
+                #"score_threshold": .95,
+                }
+            ),
+        chain_type="stuff",
+        rephrase_question = True,
+        return_source_documents=True,
+        memory=st.session_state.memory,
+        combine_docs_chain_kwargs={'prompt': prompt}
+    )
     
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -117,3 +125,5 @@ if user_openai_api_key:
                         source_details = document.metadata['source']
                         st.write(f"Source {index + 1}:", source_details[source_details.find('/maps'):],"\n")
             st.session_state.messages.append({"role": "assistant", "content": response['answer']})
+else:
+    st.warning("Please enter your OpenAI API key", icon="⚠️")
