@@ -117,7 +117,7 @@ if user_openai_api_key:
           
         with st.spinner():
             with st.chat_message("assistant"):
-                response = chain(query)
+                response = st.session_state.chain(query)
                 st.markdown(response['answer'])
                 source_documents = response['source_documents']
                 for index, document in enumerate(source_documents):
