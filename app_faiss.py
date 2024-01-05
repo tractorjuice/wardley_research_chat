@@ -37,7 +37,7 @@ st.sidebar.divider()
 user_openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", placeholder="sk-...", type="password")
    
 # Get datastore
-DATA_STORE_DIR = "datastore"
+DATA_STORE_DIR = "."
 
 if "vector_store" not in st.session_state:
     if os.path.exists(DATA_STORE_DIR):
