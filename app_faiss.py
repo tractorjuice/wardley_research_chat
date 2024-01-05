@@ -37,7 +37,7 @@ st.sidebar.divider()
 user_openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", placeholder="sk-...", type="password")
    
 # Get datastore
-DATA_STORE_DIR = "data_store"
+DATA_STORE_DIR = "datastore"
 
 if "vector_store" not in st.session_state:
     if os.path.exists(DATA_STORE_DIR):
@@ -82,7 +82,7 @@ if "llm" not in st.session_state:
         model_name=MODEL,
         temperature=0,
         max_tokens=300,
-        pl_tags=["bookchat", st.session_state.session_id],
+        pl_tags=["research2023", st.session_state.session_id],
     )  # Modify model_name if you have access to GPT-4
     
 if "chain" not in st.session_state:
