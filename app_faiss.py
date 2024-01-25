@@ -13,8 +13,10 @@ from langchain_community.vectorstores import FAISS
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 #MODEL = "gpt-3.5-turbo-16k" # Legacy
-MODEL = "gpt-3.5-turbo-1106" # Latest model
-#MODEL = "gpt-4-1106-preview"
+#MODEL = "gpt-3.5-turbo-1106" # Current model
+MODEL = "gpt-3.5-turbo-0125" # Latest model
+#MODEL = "gpt-4-0125-preview" Latest model
+DEBUG = True # True to overwrite files that already exist
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
