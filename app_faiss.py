@@ -44,6 +44,8 @@ st.sidebar.divider()
 user_openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", placeholder="sk-...", type="password")
 
 if user_openai_api_key:
+    os.environ["OPENAI_API_KEY"] = user_openai_api_key
+    
     if "vector_store" not in st.session_state:
         # If the user has provided an API key, use it
         # Swap out openai for promptlayer
