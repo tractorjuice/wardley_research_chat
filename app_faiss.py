@@ -1,6 +1,4 @@
-import os
-import re
-import uuid
+import os, re, uuid
 from langchain_openai import OpenAI
 import promptlayer
 import streamlit as st
@@ -55,7 +53,7 @@ if "vector_store" not in st.session_state:
     if os.path.exists(DATA_STORE_DIR):
         st.session_state.vector_store = FAISS.load_local(
             DATA_STORE_DIR,
-            OpenAIEmbeddings()
+            OpenAIEmbeddings(openai_api_key = user_openai_api_key)
         )
     else:
         st.write(f"Missing files. Upload index.faiss and index.pkl files to {DATA_STORE_DIR} directory first")
