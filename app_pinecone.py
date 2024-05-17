@@ -23,6 +23,8 @@ MODEL = "gpt-3.5-turbo-16k-0613"
 #MODEL = "gpt-4"
 #MODEL = "gpt-4-0613"
 #MODEL = "gpt-4-32k-0613"
+#MODEL = "gpt-4o"
+
 
 st.set_page_config(page_title="Chat with Simon's Research Maps")
 st.title("Chat with Simon's Research Maps")
