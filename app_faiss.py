@@ -18,6 +18,7 @@ MODEL = "gpt-3.5-turbo-1106" # 16K, Sept 2021. New Updated GPT 3.5 Turbo. The la
 #MODEL = "gpt-4-32k" # 32K, Sept 2021
 #MODEL = "gpt-4-turbo-preview" # 128K, Apr 2023
 #MODEL = "gpt-4-1106-preview" # 128K, Apr 2023
+#MODEL = "gpt-4o"
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
