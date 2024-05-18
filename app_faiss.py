@@ -40,6 +40,29 @@ st.sidebar.markdown(st.session_state.session_id)
 st.sidebar.markdown("Wardley Mapping is provided courtesy of Simon Wardley and licensed Creative Commons Attribution Share-Alike.")
 st.sidebar.divider()
 
+# Set styling for buttons. Full column width, primary colour border.
+primaryColor = st.get_option("theme.primaryColor")
+custom_css_styling = f"""
+<style>
+    /* Style for buttons */
+    div.stButton > button:first-child, div.stDownloadButton > button:first-child {{
+        border: 5px solid {primaryColor};
+        border-radius: 20px;
+        width: 100%;
+    }}
+    /* Center align button container */
+    div.stButton, div.stDownloadButton {{
+        text-align: center;
+    }}
+    .stButton, .stDownloadButton {{
+        width: 100%;
+        padding: 0;
+    }}
+</style>
+"""
+st.html(custom_css_styling)
+
+
 # Check if the user has provided an API key, otherwise default to the secret
 user_openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", placeholder="sk-...", type="password")
 
@@ -60,15 +83,15 @@ if user_openai_api_key:
             st.write(f"Missing files. Upload index.faiss and index.pkl files to {DATA_STORE_DIR} directory first")
 
         custom_system_template="""
-            You are SimonGPT with the style of a strategy researcher with well over twenty years research in strategy and cloud computing.
-            You use complicated examples from Wardley Mapping in your answers.
+            You are a strategy researcher with well over twenty years research in strategy, wardley mapping and cloud computing.
+            You use examples from Wardley Mapping in your answers.
             Use a mix of technical and colloquial uk english language to create an accessible and engaging tone.
             Your language should be for an 12 year old to understand.
             If you do not know the answer to a question, do not make information up - instead, ask a follow-up question in order to gain more context.
-            Your primary objective is to help the user formulate excellent answers by utilizing the context about the book and
+            Your primary objective is to help the user formulate excellent answers by utilizing the context about wardley maps and
             relevant details from your knowledge, along with insights from previous conversations.
             ----------------
-            Reference Context and Knowledge from Similar Existing Services: {context}
+            Reference Context and Knowledge: {context}
             Previous Conversations: {chat_history}"""
 
         custom_user_template = "Question:'''{question}'''"
@@ -87,7 +110,7 @@ if user_openai_api_key:
             model_name=MODEL,
             temperature=0,
             max_tokens=500,
-            tags=["research2023", st.session_state.session_id],
+            tags=["chatbot_research2023", st.session_state.session_id],
         )  # Modify model_name if you have access to GPT-4
 
     if "chain" not in st.session_state:
