@@ -41,7 +41,6 @@ if user_openai_api_key:
     if "vector_store" not in st.session_state:
         # If the user has provided an API key, use it
         # Swap out openai for promptlayer
-        openai.api_key = user_openai_api_key
 
         if os.path.exists(DATA_STORE_DIR):
             st.session_state.vector_store = FAISS.load_local(
@@ -76,11 +75,11 @@ if user_openai_api_key:
         st.session_state.memory = ConversationBufferWindowMemory(memory_key="chat_history", return_messages=True, output_key='answer')
 
     if "llm" not in st.session_state:
-        st.session_state.llm = PromptLayerChatOpenAI(
+        st.session_state.llm = ChatOpenAI(
             model_name=MODEL,
             temperature=0,
             max_tokens=300,
-            pl_tags=["research2023", st.session_state.session_id],
+            tags=["research2023", st.session_state.session_id],
         )  # Modify model_name if you have access to GPT-4
 
     if "chain" not in st.session_state:
