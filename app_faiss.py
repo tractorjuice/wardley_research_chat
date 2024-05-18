@@ -115,11 +115,12 @@ if user_openai_api_key:
             with st.chat_message("assistant"):
                 response = st.session_state.chain(query)
                 st.markdown(response['answer'])
-                source_documents = response['source_documents']
-                for index, document in enumerate(source_documents):
-                    if 'source' in document.metadata:
-                        source_details = document.metadata['source']
-                        st.write(f"Source {index + 1}:", source_details[source_details.find('/maps'):],"\n")
+                with st.expander("Source"):
+                    source_documents = response['source_documents']
+                    for index, document in enumerate(source_documents):
+                        if 'source' in document.metadata:
+                            source_details = document.metadata['source']
+                            st.write(f"Source {index + 1}:", source_details[source_details.find('/maps'):],"\n")
             st.session_state.messages.append({"role": "assistant", "content": response['answer']})
 else:
     st.warning("Please enter your OpenAI API key", icon="⚠️")
