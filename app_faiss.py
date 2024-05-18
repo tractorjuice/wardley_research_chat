@@ -12,6 +12,14 @@ from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTempla
 #MODEL = "gpt-3.5-turbo-1106" # 16K, Sept 2021. New Updated GPT 3.5 Turbo. The latest GPT-3.5 Turbo model with improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more. Returns a maximum of 4,096 output tokens.
 MODEL = "gpt-4o"
 
+# Set API keys
+PINECONE_INDEX_NAME = st.secrets["PINECONE_INDEX_NAME"]
+
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
+os.environ["LANGCHAIN_PROJECT"] = st.secrets["LANGCHAIN_PROJECT"]
+os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
+
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 
@@ -87,7 +95,7 @@ if user_openai_api_key:
             llm=st.session_state.llm,
             retriever=st.session_state.vector_store.as_retriever(
                 search_kwargs={
-                    "k": 20,
+                    "k": 10,
                     #"score_threshold": .95,
                     }
                 ),
