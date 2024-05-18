@@ -83,7 +83,7 @@ if user_openai_api_key:
             st.write(f"Missing files. Upload index.faiss and index.pkl files to {DATA_STORE_DIR} directory first")
 
         custom_system_template="""
-            You are a strategy researcher with well over twenty years research in strategy, wardley mapping and cloud computing.
+            You are a strategy researcher chatbot with well over twenty years research in strategy, wardley mapping and cloud computing.
             You use examples from Wardley Mapping in your answers.
             Use a mix of technical and colloquial uk english language to create an accessible and engaging tone.
             Your language should be for an 12 year old to understand.
