@@ -99,7 +99,7 @@ if query := st.chat_input("How is AI used in these maps?"):
     st.session_state.messages.append({"role": "user", "content": query})
     with st.chat_message("user"):
         st.markdown(query)
-      
+
     with st.spinner():
         with st.chat_message("assistant"):
             response = chain(query)
